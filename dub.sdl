@@ -1,0 +1,14 @@
+name        "socks-client"
+description "SOCKS 5 client implementation"
+authors     "Pavel Chebotarev"
+
+license "MIT"
+
+dependency "vibe-core" version="~>1.4.0"
+
+configuration "default" {
+    versions   "VibeDisableCommandLineParsing"
+    versions   "VibeUseOpenSSL11"
+
+    targetType "library"
+}
