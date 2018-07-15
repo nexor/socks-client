@@ -1,0 +1,4 @@
+name "local-socks5"
+description "SOCKS 5 usage example"
+
+dependency "socks-client" version="~master" path="../../"
