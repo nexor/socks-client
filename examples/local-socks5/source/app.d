@@ -7,15 +7,15 @@ import std.stdio;
 
 int main(string[] args)
 {
-    Socks5Info socks5 = {
-        host: "localhost",
-        port: 1080
+    Socks5Options socks5Options = {
+        host: "127.0.0.1",
+        port: 1080,
     };
 
-    TCPConnection conn = connectTCPSocks(socks5, "127.0.1.1", 80);
+    TCPConnection conn = connectTCPSocks(socks5Options, "localhost", 80);
 
     string request = "GET / HTTP/1.1\r\n" ~
-        "Host: 127.0.1.1\r\n" ~
+        "Host: ya.ru\r\n" ~
         "User-Agent: vibe-client/0.0.0\r\n" ~
         "Accept: */*\r\n\r\n";
 
