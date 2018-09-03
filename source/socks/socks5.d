@@ -1,8 +1,7 @@
 module socks.socks5;
 
-import vibe.core.core;
-import vibe.core.log;
-import vibe.core.net;
+import vibe.core.net : resolveHost, NetworkAddress;
+import std.socket : AddressFamily;
 
 enum AuthMethod: ubyte
 {
@@ -41,7 +40,9 @@ enum ReplyCode: ubyte
     CONNECTION_REFUSED = 0x05,
     TTL_EXPIRED = 0x06,
     CMD_NOTSUPPORTED = 0x07,
-    ADDR_NOTSUPPORTED = 0x08
+    ADDR_NOTSUPPORTED = 0x08,
+
+    UNKNOWN = 0xff,
 }
 
 enum isSocksOptions(T) =
@@ -64,15 +65,14 @@ alias SocksTCPConnector = bool delegate(in string host, in ushort port);
 alias SocksDataReader = void delegate(ubyte[] data);
 alias SocksDataWriter = void delegate(in ubyte[]);
 
-import vibe.core.net;
-import std.socket : AddressFamily;
-
 struct Socks5
 {
     protected:
         SocksTCPConnector connector;
         SocksDataReader reader;
         SocksDataWriter writer;
+
+        ReplyCode _replyCode = ReplyCode.UNKNOWN;
 
     public:
         this(SocksTCPConnector connector, SocksDataReader reader, SocksDataWriter writer)
@@ -85,31 +85,27 @@ struct Socks5
         bool connect(in Socks5Options options, string host, ushort port)
         {
             if (!connector(options.host, options.port)) {
-                assert(0, "Can't connect to a proxy server");
+                _replyCode = ReplyCode.NETWORK_UNREACHABLE;
+
+                return false;
             }
 
             AuthMethod chosenMethod = handshake(options);
 
-            logDebug("Chosen method: %s", chosenMethod);
+            ReplyCode _replyCode = request(host, port, options.resolveHost);
 
-            ReplyCode reply = request(host, port, options.resolveHost);
+            return _replyCode == ReplyCode.SUCCEEDED;
+        }
 
-            if (reply == ReplyCode.SUCCEEDED) {
-                logDebug("Connected to proxy");
-
-                return true;
-            } else {
-                logError("Error connecting to proxy: %d", reply);
-
-                return false;
-            }
+        @property
+        ReplyCode replyCode()
+        {
+            return _replyCode;
         }
 
     protected:
         AuthMethod handshake(in Socks5Options options)
         {
-            logDebug("Connection handshake");
-
             ubyte[] data = [0x05, cast(ubyte)options.authMethods.length];
             writer(data);
             writer(cast(ubyte[])options.authMethods);
@@ -137,15 +133,11 @@ struct Socks5
             if (resolveHostname) {
                 NetworkAddress address = resolveHost(host, AddressFamily.UNSPEC, resolveHostname);
 
-                logDebug("Resolved host: %s", address.sockAddrInet4.sin_addr.s_addr);
-
                 union IpBuffer
                 {
                     int ip;
                     ubyte[ip.sizeof] buffer;
                 }
-
-                logDebug("Connection request");
 
                 IpBuffer ipBuf = {ip:address.sockAddrInet4.sin_addr.s_addr};
                 hostData = ipBuf.buffer;
