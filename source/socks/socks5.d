@@ -3,6 +3,8 @@ module socks.socks5;
 import vibe.core.net : resolveHost, NetworkAddress;
 import std.socket : AddressFamily;
 
+enum Socks5Version = 0x05;
+
 enum AuthMethod: ubyte
 {
     NOAUTH = 0x00,
@@ -106,14 +108,15 @@ struct Socks5
     protected:
         AuthMethod handshake(in Socks5Options options)
         {
-            ubyte[] data = [0x05, cast(ubyte)options.authMethods.length];
+            ubyte[] data = [Socks5Version, cast(ubyte)options.authMethods.length];
             writer(data);
             writer(cast(ubyte[])options.authMethods);
 
             ubyte[2] answer;
             reader(answer[]);
 
-            assert(answer[0] == 0x05);
+            assert(answer[0] == Socks5Version,
+                "Error in reply from server. Protocol version must be 0x05 (see RFC 1928, chapter 3).");
 
             return cast(AuthMethod)answer[1];
         }
@@ -123,7 +126,7 @@ struct Socks5
             import std.bitmanip;
 
             ubyte[] data = [
-                0x05,               // SOCKS version
+                Socks5Version,      // SOCKS version
                 RequestCmd.CONNECT, // request command
                 0x00,               // rsv
                 AddressType.IPV4    // address type
@@ -155,7 +158,8 @@ struct Socks5
 
             reader(answer[]);
 
-            assert(answer[0] == 0x05);
+            assert(answer[0] == Socks5Version,
+                "Error in reply from server: protocol version must be 0x05 (see RFC 1928, chapter 6).");
 
             return cast(ReplyCode)answer[1];
         }
