@@ -4,7 +4,7 @@ authors     "Pavel Chebotarev"
 
 license "MIT"
 
-dependency "vibe-core" version="~>1.4.0"
+dependency "vibe-core" version=">=1.4.0"
 
 configuration "default" {
     versions   "VibeDisableCommandLineParsing"
