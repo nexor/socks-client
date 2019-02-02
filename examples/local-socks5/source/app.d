@@ -5,6 +5,7 @@ import std.typecons;
 import socks.client.vibe;
 import std.stdio;
 
+// connect to dlang.org through local socks5 proxy
 int main(string[] args)
 {
     Socks5Options socks5Options = {
@@ -12,7 +13,7 @@ int main(string[] args)
         port: 1080,
     };
 
-    TCPConnection conn = connectTCPSocks(socks5Options, "localhost", 80);
+    TCPConnection conn = connectTCPSocks(socks5Options, "dlang.org", 80);
 
     string request = "GET / HTTP/1.1\r\n" ~
         "Host: ya.ru\r\n" ~
