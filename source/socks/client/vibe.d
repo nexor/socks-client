@@ -1,5 +1,9 @@
 module socks.client.vibe;
 
+//version(SocksClientDriverVibed):
+
+pragma(msg, "Using vibed driver for socks-client");
+
 public import socks.socks5;
 import core.time;
 import vibe.core.net;
@@ -17,10 +21,17 @@ TCPConnection connectTCPSocks(S)(S socksOptions, string host, ushort port, strin
 
         return true;
     };
-    SocksDataReader reader = (ubyte[] data) { conn.read(data); };
+    SocksDataReader reader = (ubyte[] data) {
+        conn.read(data);
+    };
     SocksDataWriter writer = (in ubyte[] data) { conn.write(data); };
+    SocksHostnameResolver resolver = (in string hostname) {
+        NetworkAddress address = resolveHost(hostname, AddressFamily.UNSPEC, true);
 
-    auto socks5 = Socks5(connector, reader, writer);
+        return address.toAddressString();
+    };
+
+    auto socks5 = Socks5(reader, writer, connector, resolver);
 
     socks5.connect(socksOptions, host, port);
 
