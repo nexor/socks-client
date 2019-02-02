@@ -1,7 +1,6 @@
 import vibe.core.net;
 import vibe.core.log;
-import vibe.core.core;
-import socks.client.vibe;
+import socks.client.d;
 import std.stdio;
 
 string proxyHost = "127.0.0.1";
@@ -32,7 +31,7 @@ int main(string[] args)
 
     logWarn("Reading response");
     conn.read(chunk);
-    writefln("%s", cast(char[])chunk);
+    writefln("Data from server (%d bytes):\n----\n%s\n----", chunk.length, cast(char[])chunk);
 
     return 0;
 }
