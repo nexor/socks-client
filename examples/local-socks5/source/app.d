@@ -19,7 +19,7 @@ int main(string[] args)
     TCPConnection conn = connectTCPSocks(socks5Options, "dlang.org", 80);
 
     string request = "GET / HTTP/1.1\r\n" ~
-        "Host: ya.ru\r\n" ~
+        "Host: dlang.org\r\n" ~
         "User-Agent: vibe-client/0.0.0\r\n" ~
         "Accept: */*\r\n\r\n";
 

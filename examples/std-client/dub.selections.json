@@ -1,0 +1,12 @@
+{
+	"fileVersion": 1,
+	"versions": {
+		"eventcore": "0.8.40",
+		"libasync": "0.8.3",
+		"memutils": "0.4.13",
+		"socks-client": {"path":"../../"},
+		"stdx-allocator": "2.77.5",
+		"taggedalgebraic": "0.10.12",
+		"vibe-core": "1.6.0"
+	}
+}

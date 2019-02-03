@@ -1,0 +1,6 @@
+name "stdclient"
+description "SOCKS 5 with dlang-requests usage example"
+
+dependency "socks-client" version="~master" path="../../"
+
+subConfiguration "socks-client" "std"

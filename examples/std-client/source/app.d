@@ -8,9 +8,11 @@ ushort proxyPort = 1080;
 
 int main(string[] args)
 {
+    parseArgs(args);
+
     Socks5Options socks5Options = {
-        host: "10.93.17.1",
-        port: 1080,
+        host: proxyHost,
+        port: proxyPort,
         resolveHost: false
     };
 
@@ -19,7 +21,7 @@ int main(string[] args)
     TcpSocket conn = connectTCPSocks(socks5Options, address);
 
     string request = "GET / HTTP/1.1\r\n" ~
-        "Host: ya.ru\r\n" ~
+        "Host: dlang.org\r\n" ~
         "User-Agent: std-client/0.0.0\r\n" ~
         "Accept: */*\r\n\r\n";
 
@@ -30,7 +32,7 @@ int main(string[] args)
 
     writefln("%s", "Reading response:");
     long bytes = conn.receive(response);
-    writefln("----\n%s----\n", cast(char[])response[0..bytes]);
+    writefln("Data from server (%d bytes):\n----\n%s\n----\n", bytes, cast(char[])response[0..bytes]);
 
     return 0;
 }
