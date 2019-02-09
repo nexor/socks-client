@@ -79,7 +79,7 @@ struct Socks5
 
     public:
         @nogc
-        this(SocksDataReader reader, SocksDataWriter writer, SocksTCPConnector connector = null, SocksHostnameResolver = null)
+        this(SocksDataReader reader, SocksDataWriter writer, SocksTCPConnector connector = null, SocksHostnameResolver resolver = null)
         {
             this.connector = connector;
             this.reader = reader;
