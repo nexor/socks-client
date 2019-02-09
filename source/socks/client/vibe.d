@@ -1,6 +1,6 @@
 module socks.client.vibe;
 
-//version(SocksClientDriverVibed):
+version(SocksClientDriverVibed):
 
 pragma(msg, "Using vibed driver for socks-client");
 

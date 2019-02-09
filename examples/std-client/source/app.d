@@ -1,12 +1,11 @@
-import vibe.core.net;
-import vibe.core.log;
+import std.typecons;
 import socks.client.d;
+import std.socket;
 import std.stdio;
 
 string proxyHost = "127.0.0.1";
 ushort proxyPort = 1080;
 
-// connect to dlang.org through local socks5 proxy
 int main(string[] args)
 {
     parseArgs(args);
@@ -14,24 +13,26 @@ int main(string[] args)
     Socks5Options socks5Options = {
         host: proxyHost,
         port: proxyPort,
+        resolveHost: false
     };
 
-    TCPConnection conn = connectTCPSocks(socks5Options, "dlang.org", 80);
+    auto address = new InternetAddress("dlang.org", 80);
+
+    TcpSocket conn = connectTCPSocks(socks5Options, address);
 
     string request = "GET / HTTP/1.1\r\n" ~
         "Host: dlang.org\r\n" ~
-        "User-Agent: vibe-client/0.0.0\r\n" ~
+        "User-Agent: std-client/0.0.0\r\n" ~
         "Accept: */*\r\n\r\n";
 
-    logWarn("Writing request");
-    conn.write(request);
+    writefln("%s", "Writing request");
+    conn.send(request);
 
     ubyte[8192] response;
-    ubyte[] chunk = response[0..conn.leastSize];
 
-    logWarn("Reading response");
-    conn.read(chunk);
-    writefln("Data from server (%d bytes):\n----\n%s\n----", chunk.length, cast(char[])chunk);
+    writefln("%s", "Reading response:");
+    long bytes = conn.receive(response);
+    writefln("Data from server (%d bytes):\n----\n%s\n----\n", bytes, cast(char[])response[0..bytes]);
 
     return 0;
 }
