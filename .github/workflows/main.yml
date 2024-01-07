@@ -1,0 +1,27 @@
+name: Run all D Tests
+on: [pull_request]
+
+jobs:
+  test:
+    name: Dub Tests
+    strategy:
+      matrix:
+        dc: [dmd-2.106.1, ldc-1.36.0]
+        config: [vibed, std]
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install D compiler
+        uses: dlang-community/setup-dlang@v1
+        with:
+          compiler: ${{ matrix.dc }}
+
+      - name: Run tests
+        shell: bash
+        env:
+          DC: ${{ matrix.dc }}
+        run: |
+          dub -q test --config=${{ matrix.config }}
+          dub build -b release --config=${{ matrix.config }}
