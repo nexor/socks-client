@@ -4,7 +4,7 @@ import socks.client.d;
 import std.stdio;
 
 string proxyHost = "127.0.0.1";
-ushort proxyPort = 1080;
+ushort proxyPort = 1089;
 
 // connect to dlang.org through local socks5 proxy
 int main(string[] args)
@@ -16,7 +16,7 @@ int main(string[] args)
         port: proxyPort,
     };
 
-    TCPConnection conn = connectTCPSocks(socks5Options, "dlang.org", 80);
+    TCPConnection conn = connectTCPSocks(socks5Options, "dlang.org", 443);
 
     string request = "GET / HTTP/1.1\r\n" ~
         "Host: dlang.org\r\n" ~

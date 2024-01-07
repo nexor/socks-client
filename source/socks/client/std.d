@@ -1,31 +1,15 @@
 module socks.client.std;
 
-version(SocksClientDriverStd):
-
-pragma(msg, "Using std driver for socks-client");
-
 public import socks.socks5;
 
-import std.socket;
+import std.socket : TcpSocket, Address, InternetAddress;
 import std.conv : to;
 
-
-TcpSocket connectTCPSocks(S)(S socksOptions, Address address)
-    if (isSocksOptions!S)
+TcpSocket connectTCPSocks(Socks5Options socksOptions, TcpSocket tcpSocket, Address address)
 {
-    auto socket = new TcpSocket;
-
-    return connectTCPSocks(socksOptions, socket, address);
-}
-
-TcpSocket connectTCPSocks(S)(S socksOptions, Socket socket, Address address)
-    if (isSocksOptions!S)
-{
-    TcpSocket tcpSocket = cast(TcpSocket)socket;
-
     SocksTCPConnector connector = (in string host, in ushort port)
     {
-        import std.typecons;
+        import std.typecons : scoped;
 
         auto socksAddress = scoped!InternetAddress(host, port);
         tcpSocket.connect(socksAddress);
@@ -47,4 +31,11 @@ TcpSocket connectTCPSocks(S)(S socksOptions, Socket socket, Address address)
     socks5.connect(socksOptions, address.toAddrString(), address.toPortString().to!ushort);
 
     return tcpSocket;
+}
+
+TcpSocket connectTCPSocks(Socks5Options socksOptions, Address address)
+{
+    auto socket = new TcpSocket;
+
+    return connectTCPSocks(socksOptions, socket, address);
 }

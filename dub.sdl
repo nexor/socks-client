@@ -4,18 +4,15 @@ authors     "Pavel Chebotarev"
 
 license "MIT"
 
-configuration "std" {
-    versions "SocksClientDriverStd"
+targetType "library"
 
-    targetType "library"
-}
+dependency "vibe-core" version=">=1.4.0"
 
-configuration "vibed" {
-    dependency "vibe-core" version=">=1.4.0"
+#configuration "vibed" {
 
-    versions   "VibeDisableCommandLineParsing"
-    versions   "VibeUseOpenSSL11"
-    versions   "SocksClientDriverVibed"
+#    versions   "VibeDisableCommandLineParsing"
+#    versions   "VibeUseOpenSSL11"
+#    versions   "SocksClientDriverVibed"
 
-    targetType "library"
-}
+#    targetType "library"
+#}

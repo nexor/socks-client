@@ -79,7 +79,12 @@ struct Socks5
 
     public:
         @nogc
-        this(SocksDataReader reader, SocksDataWriter writer, SocksTCPConnector connector = null, SocksHostnameResolver resolver = null)
+        this(
+            SocksDataReader reader,
+            SocksDataWriter writer,
+            SocksTCPConnector connector = null,
+            SocksHostnameResolver resolver = null
+            )
         {
             this.connector = connector;
             this.reader = reader;
@@ -113,7 +118,7 @@ struct Socks5
     protected:
         AuthMethod handshake(in Socks5Options options)
         {
-            ubyte[] data = [Socks5Version, cast(ubyte)options.authMethods.length];
+            const ubyte[] data = [Socks5Version, cast(ubyte)options.authMethods.length];
             writer(data);
             writer(cast(ubyte[])options.authMethods);
 
@@ -130,19 +135,11 @@ struct Socks5
         {
             Socks5RequestPacket packet;
 
-            ubyte[] data = [
-                Socks5Version,      // SOCKS version
-                RequestCmd.CONNECT, // request command
-                0x00,               // rsv
-                AddressType.IPV4    // address type
-            ];
-            ubyte[] hostData;
-
             IpAddress address;
 
             if (resolveHostname && resolver !is null) {
                 address = IpAddress(resolver(host));
-            } else { // no neeed to resolve address
+            } else {
                 address = IpAddress(host);
             }
 
@@ -154,7 +151,7 @@ struct Socks5
                 packet.setDomain(host, port);
             }
 
-            writer(packet[]);
+            writer(packet.getBytes());
 
             ubyte[10] answer; // response packet size
 
@@ -174,10 +171,10 @@ protected:
         @safe:
             struct PacketData
             {
-                ubyte socksVersion = Socks5Version;        // SOCKS version
-                ubyte requestCommand = RequestCmd.CONNECT; // request command
-                ubyte rsv = 0x00;                          // rsv
-                ubyte addressType;                         // address type
+                const ubyte socksVersion = Socks5Version;        // SOCKS version
+                const ubyte requestCommand = RequestCmd.CONNECT; // request command
+                const ubyte rsv = 0x00;                          // rsv
+                ubyte addressType;                               // address type
                 char[1 + ubyte.max + ushort.sizeof] hostData;
             }
 
@@ -228,7 +225,7 @@ protected:
                 setPort(port);
             }
 
-            ubyte[] opSlice()
+            ubyte[] getBytes()
             {
                 return buffer[0 .. 4 + hostDataLength];
             }
@@ -285,13 +282,13 @@ protected:
             _ip4address = value;
         }
 
-        @property @safe
+        @property @safe pure const
         uint ip4()
         {
             return _ip4address;
         }
 
-        @property
+        @property const
         bool isIp4()
         {
             return addressFamily == AddressFamily.INET;
@@ -304,7 +301,7 @@ protected:
             _ip6address = value;
         }
 
-        @property @safe
+        @property @safe const
         ubyte[16] ip6()
         {
             return _ip6address;
@@ -319,14 +316,24 @@ protected:
 
     unittest
     {
-        auto ip = IpAddress("127.0.0.1");
+        const ip = IpAddress("127.0.0.1");
         assert(ip.isIp4);
-        assert(ip.ip4 == 2130706433);
+        assert(ip.ip4 == 2_130_706_433);
+    }
 
-        import std.bigint;
-        ip = IpAddress("2001:0db8:85a3:0000:0000:8a2e:0370:7334");
+    unittest
+    {
+        import std.bigint : BigInt;
+
+        auto ip = IpAddress("2001:0db8:85a3:0000:0000:8a2e:0370:7334");
         assert(ip.isIp6);
+    }
 
+    unittest
+    {
+        import std.bigint : BigInt;
+
+        const ip = IpAddress("2001:0db8:85a3:0000:0000:8a2e:0370:7334");
         auto ipInt = BigInt(0);
         foreach (i; 0..ip.ip6.length) {
             ipInt += BigInt(ip.ip6[i]) << 8*(15-i);
