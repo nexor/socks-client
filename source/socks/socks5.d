@@ -228,7 +228,7 @@ protected:
                 setPort(port);
             }
 
-            ubyte[] opSlice()
+            ubyte[] opSlice() return
             {
                 return buffer[0 .. 4 + hostDataLength];
             }
