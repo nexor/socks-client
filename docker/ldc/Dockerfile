@@ -1,7 +1,7 @@
 FROM debian:bookworm-slim
 
 ENV COMPILER=ldc \
-    COMPILER_VERSION=1.24.0
+    COMPILER_VERSION=1.36.0
 
 RUN apt-get update && apt-get install -y curl libcurl4 build-essential zlib1g-dev libssl-dev \
  && curl -fsS -o /tmp/install.sh https://dlang.org/install.sh
